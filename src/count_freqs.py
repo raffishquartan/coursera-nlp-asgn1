@@ -64,13 +64,13 @@ def get_ngrams(sent_iterator, n):
     of tokens.
     """
     for sent in sent_iterator:
-         #Add boundary symbols to the sentence
-         w_boundary = (n-1) * [(None, "*")]
-         w_boundary.extend(sent)
-         w_boundary.append((None, "STOP"))
-         #Then extract n-grams
-         ngrams = (tuple(w_boundary[i:i+n]) for i in xrange(len(w_boundary)-n+1))
-         for n_gram in ngrams: #Return one n-gram at a time
+        #Add boundary symbols to the sentence
+        w_boundary = (n-1) * [(None, "*")]
+        w_boundary.extend(sent)
+        w_boundary.append((None, "STOP"))
+        #Then extract n-grams
+        ngrams = (tuple(w_boundary[i:i+n]) for i in xrange(len(w_boundary)-n+1))
+        for n_gram in ngrams: #Return one n-gram at a time
             yield n_gram        
 
 
