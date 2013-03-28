@@ -28,6 +28,7 @@ along with MCNLP.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import logging
 import common
+import operator
 
 class CountsFile:
     '''
@@ -35,9 +36,11 @@ class CountsFile:
     '''
     _counts = {}
     _filename = ''
+    _tag_list = []
     
-    def __init__(self, filename):
+    def __init__(self, filename, tag_list):
         self._filename = filename
+        self._tag_list = tag_list
         self.load()
     
     def load(self):
@@ -66,7 +69,7 @@ class CountsFile:
         # Linetype not used: linetype = splitline[1]
         count = splitline[0]
         key = ' '.join(splitline[2:])
-        self._counts[key] = count
+        self._counts[key] = float(count)
     
     def emission_parameter(self, count_wordtag, count_tag):
         '''
@@ -79,6 +82,22 @@ class CountsFile:
             return self[count_wordtag] / self[count_tag]
         else:
             return 0
+    
+    def arg_max_tag(self, word):
+        '''
+        Returns arg-max tag for the word /word/, given the counts
+        '''
+        tag_probs = {}
+        for tag in self._tag_list:
+            tag_probs[tag] = self.emission_parameter(tag + ' ' + word, tag)
+
+        max_tag = max(tag_probs.iterkeys(), key=(lambda key: tag_probs[key]))
+        max_prob = tag_probs[max_tag]
+        
+        if max_prob == 0:
+            return self.arg_max_tag('_RARE_')
+        else:
+            return max_tag
 
 
 
@@ -190,7 +209,17 @@ class TestFile(object):
         for i, word in enumerate(self._word_tag_pairs[:]):
             if counts[word] < threshold and word != '':
                 self._word_tag_pairs[i] = replacement
-                print("Replacing '{0}' - count: {1}".format(word, counts[word]))
+    
+    def tag_and_save_words(self, cf, savepath):
+        '''
+        Tags words using the CountsFile /cf/ and saves the result to /savepath/
+        '''
+        with open(savepath, 'w') as f:
+            for word in self._word_tag_pairs:
+                if word.strip() == '':
+                    f.write('\n')
+                else:
+                    f.write("{0} {1}\n".format(word, cf.arg_max_tag(word)))
 
 
 

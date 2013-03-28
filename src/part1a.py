@@ -1,6 +1,4 @@
 '''
-common -- Commonly used snippets
-
 This file is part of assignment 1 for Michael Collin's NLP Coursera 
 course, 02-04/2013 (MCNLP).
 
@@ -30,11 +28,8 @@ import logging
 import nlp_helpers
 
 if __name__ == '__main__':
+    tags = ['O', 'I-GENE'] # these could be parsed out when the TrainingFile is loaded, but who cares 
     tf = nlp_helpers.TrainingFile(r'..\resources\gene.train')
     ifwc = nlp_helpers.InputFileWordCounts(r'..\resources\gene.train')
-    tf.replace_rare_words(ifwc, 2, '_RARE_')
+    tf.replace_rare_words(ifwc, 5, '_RARE_')
     tf.save(r'..\output\gene.replaced')
-    
-    cf = nlp_helpers.CountsFile(r'..\output\gene.train.counts')
-    print cf['O Americans']
-    print cf['O']
