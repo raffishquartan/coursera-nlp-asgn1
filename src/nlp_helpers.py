@@ -66,7 +66,6 @@ class CountsFile:
     
     def _load_count(self, fileline):
         splitline = fileline.split()
-        # Linetype not used: linetype = splitline[1]
         count = splitline[0]
         key = ' '.join(splitline[2:])
         self._counts[key] = float(count)
@@ -87,17 +86,22 @@ class CountsFile:
         '''
         Returns arg-max tag for the word /word/, given the counts
         '''
-        tag_probs = {}
-        for tag in self._tag_list:
-            tag_probs[tag] = self.emission_parameter(tag + ' ' + word, tag)
-
-        max_tag = max(tag_probs.iterkeys(), key=(lambda key: tag_probs[key]))
-        max_prob = tag_probs[max_tag]
-        
-        if max_prob == 0:
+        candidates = set(map(lambda tag: '{0} {1}'.format(tag, word), self._tag_list))
+        if len(candidates & set(self._counts.keys())) == 0:
+            logging.info("{0} is a rare word".format(word))
             return self.arg_max_tag('_RARE_')
         else:
-            return max_tag
+            tag_probs = {}
+            for tag in self._tag_list:
+                tag_probs[tag] = self.emission_parameter(tag + ' ' + word, tag)
+    
+            max_tag = max(tag_probs.iterkeys(), key=(lambda key: tag_probs[key]))
+            max_prob = tag_probs[max_tag]
+            
+            if max_prob == 0:
+                raise Exception('Word {0} has 0 probability but is in self._tag_list')
+            else:
+                return max_tag
 
 
 
