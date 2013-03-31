@@ -235,12 +235,14 @@ class TrainingFile(object):
     '''
     _word_tag_pairs = []
     _filename = ''
+    _tag_list = []
     
-    def __init__(self, filename):
+    def __init__(self, filename, tag_list):
         '''
         Sets _filename of training file and loads it
         '''
         self._filename = filename
+        self._tag_list = tag_list
         self.load()
     
     def __getitem__(self, i):
@@ -310,10 +312,25 @@ class TrainingFile(object):
     
     def replace_rare_words(self, counts, threshold, replacement):
         '''
-        Replaces all _word_tag_pairs in document that occur less than /threshold/ times
-        with /replacement/ (gets word_tag_pair counts from /counts/ parameter)
+        Replaces all words in document that occur less than /threshold/ times 
+        with /replacement/, grouping all taggings of word together (gets word
+        counts from /counts/ parameter, summing counts of all possible tags)
         '''
+        # New version, replaces rare words, not rare word-tag pairs:
+        ######################################################################
+        for i, word_tag_pair in enumerate(self._word_tag_pairs[:]):
+            wtp_string = ' '.join(word_tag_pair)
+            if wtp_string != '':
+                word = word_tag_pair[0]
+                all_word_tag_pairs = map(lambda tag: '{0} {1}'.format(word, tag), self._tag_list)
+                word_count = sum(map(lambda word_tag_pair: counts[word_tag_pair], all_word_tag_pairs))
+                if word_count < threshold:
+                    self._word_tag_pairs[i][0] = replacement
+        '''
+        # Original version, replaces rare word-tag pairs, not rare words:
+        ######################################################################
         for i, word_tag_pair in enumerate(self._word_tag_pairs[:]):
             wtp_string = ' '.join(word_tag_pair)
             if counts[wtp_string] < threshold and wtp_string != '':
                 self._word_tag_pairs[i][0] = replacement
+        '''

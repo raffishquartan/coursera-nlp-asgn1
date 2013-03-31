@@ -28,6 +28,7 @@ import nlp_helpers
 
 # Run this file after part1a and then running count.freqs on gene.replaced
 if __name__ == '__main__':
-    cf = nlp_helpers.CountsFile(r'..\output\gene.replaced.counts', ['I-GENE', 'O'])
+    tags = ['I-GENE', 'O']
+    cf = nlp_helpers.CountsFile(r'..\output\gene.replaced.counts', tags)
     testf = nlp_helpers.TestFile(r'..\resources\gene.dev')
     testf.tag_and_save_words(cf, r'..\output\gene_dev.p1.out')

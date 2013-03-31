@@ -26,10 +26,23 @@ along with MCNLP.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import logging
 import nlp_helpers
+import os
 
 if __name__ == '__main__':
     tags = ['O', 'I-GENE'] # these could be parsed out when the TrainingFile is loaded, but who cares 
+    test_file = raw_input(r'Enter test file (..\resources\gene.(dev|test)): ')
+    key_file = raw_input(r'Enter key file (blank if none exists): ')
+    eval_output_file = raw_input(r'Enter tagging output file (..\output\gene_(dev|test).p1.out): ')
+    
     tf = nlp_helpers.TrainingFile(r'..\resources\gene.train', tags)
     ifwc = nlp_helpers.InputFileWordCounts(r'..\resources\gene.train')
     tf.replace_rare_words(ifwc, 5, '_RARE_')
     tf.save(r'..\output\gene.replaced')
+    os.system(r'C:\Python27\python.exe count_freqs.py ../output/gene.replaced > ..\output\gene.replaced.counts')
+    cf = nlp_helpers.CountsFile(r'..\output\gene.replaced.counts', tags)
+    testf = nlp_helpers.TestFile(test_file)
+    testf.tag_and_save_words(cf, eval_output_file)
+    if key_file != '':
+        os.system(r'C:\Python27\python.exe eval_gene_tagger.py ../resources/gene.key ../output/gene_dev.p1.out')
+    else:
+        print "No key file specified - evaluation not possible"
