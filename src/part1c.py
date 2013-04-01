@@ -31,4 +31,4 @@ if __name__ == '__main__':
     tags = ['I-GENE', 'O']
     cf = nlp_helpers.CountsFile(r'..\output\gene.replaced.counts', tags)
     testf = nlp_helpers.TestFile(r'..\resources\gene.test')
-    testf.tag_and_save_words(cf, r'..\output\gene_test.p1.out')
+    testf.tag_and_save_argmax(cf, r'..\output\gene_test.p1.out')

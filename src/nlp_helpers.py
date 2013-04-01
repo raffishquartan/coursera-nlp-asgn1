@@ -82,6 +82,18 @@ class CountsFile:
         else:
             return 0
     
+    def transition_probability(self, trigram, bigram):
+        '''
+        Returns q(y_i | y_{i-2}, y_{i-1} using counts
+        
+        Uses * to denote y_{i-1} and y_0, and STOP as the tag for y_{n+1}.
+        Parameters are white-space delimited tag strings.
+        '''
+        if trigram in self._counts:
+            return self[trigram] / self[bigram]
+        else:
+            return 0
+    
     def arg_max_tag(self, word):
         '''
         Returns arg-max tag for the word /word/, given the counts
@@ -214,9 +226,9 @@ class TestFile(object):
             if counts[word] < threshold and word != '':
                 self._word_tag_pairs[i] = replacement
     
-    def tag_and_save_words(self, cf, savepath):
+    def tag_and_save_argmax(self, cf, savepath):
         '''
-        Tags words using the CountsFile /cf/ and saves the result to /savepath/
+        Tags using the argmax, CountsFile /cf/ and saves to /savepath/
         '''
         with open(savepath, 'w') as f:
             for word in self._word_tag_pairs:
@@ -225,6 +237,12 @@ class TestFile(object):
                 else:
                     f.write("{0} {1}\n".format(word, cf.arg_max_tag(word)))
 
+    def tag_and_save_viterbi(self, cf, savepath):
+        '''
+        Tags using the Viterbi alg, CountsFile /cf/ and saves to /savepath/
+        '''
+        with open(savepath, 'w') as f:
+            pass
 
 
 class TrainingFile(object):
